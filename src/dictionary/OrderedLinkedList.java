@@ -11,11 +11,13 @@ import java.util.NoSuchElementException;
 public class OrderedLinkedList<K extends Comparable<? super K>, V> implements
         Dictionary<K, V> {
 
-
     // Keys have a compareTo(K other)
     // Need to implement Iterator<DictionaryEntry <K, V>> - returns an iterator of DictionaryEntry
 
+    private OrderedLinkedListEntry<K, V> head;
     private int size;
+
+    // Need createOrderedList() ???
 
     /**
      *
@@ -44,16 +46,7 @@ public class OrderedLinkedList<K extends Comparable<? super K>, V> implements
      *             if given key does not exist in the dictionary
      */
     public V get(K key) throws NoSuchElementException {
-
-        V value;
-
-        try {
-
-        } catch (NoSuchElementException e) {
-
-        }
-
-        return (V) value;
+        // TODO
     }
 
     /**
@@ -66,7 +59,59 @@ public class OrderedLinkedList<K extends Comparable<? super K>, V> implements
      * @param value
      *            The value to be associated with the key
      */
-    public void put(K key, V value);
+    public void put(K key, V value) {
+
+        OrderedLinkedListEntry<K, V> prev = this.findPrev(key);
+        OrderedLinkedListEntry<K, V> newEntry = new OrderedLinkedListEntry<K, V>(key, value);
+
+        // If list is empty, add single node, and make head refer to this
+        if (prev == null) {
+
+            newEntry.setNext(head);
+            head = newEntry;
+
+        // If prevKey == key, update the value
+        } else if (prev.getKey().compareTo(key) == 0) {
+
+            prev.setValue(value);
+
+        // If prev < key, add a new entry with key and value after prev
+        } else if (prev.getKey().compareTo(key) < 0) {
+
+            newEntry.setNext(prev.getNext());
+            prev.setNext(newEntry);
+
+        // Add a new entry with key and value as first node
+        } else {
+
+            newEntry.setNext(head);
+            head = newEntry;
+
+        }
+
+    }
+
+    // Helper for put
+    private OrderedLinkedListEntry<K,V> findPrev(K searchKey){
+
+        // post: Returns the Node with key equal to searchKey, if any exists in the list.
+        // Or it returns the previous key (if any).
+        // Or if the previous key does not exists, it returns the Node with key after searchKey (if any).
+        // Or it returns null if the list is empty.
+
+        OrderedLinkedListEntry<K,V> prev = head;
+
+        if ( (prev != null) && (prev.getKey().compareTo(searchKey)<0) ) {
+
+            OrderedLinkedListEntry<K,V> curr = prev.getNext();
+
+            while ((curr != null)&&(curr.getKey().compareTo(searchKey) <= 0)){
+                prev = curr;
+                curr = curr.getNext( );
+            }
+        }
+        return prev;
+    }
 
     /**
      * Removes the entry for the key from the dictionary if it is present.
@@ -76,11 +121,46 @@ public class OrderedLinkedList<K extends Comparable<? super K>, V> implements
      * @throws NoSuchElementException
      *             if the key is not in the dictionary
      */
-    public void remove(K key) throws NoSuchElementException;
+    public void remove(K key) throws NoSuchElementException {
+        //TODO
+    }
 
     /**
      * Removes all entries from the dictionary
      */
-    public void clear();
+    public void clear() {
+        //TODO
+    }
 
+    @Override
+    public Iterator<DictionaryEntry<K, V>> iterator() {
+            return new ListIterator<K, V>();
+    }
+
+    private class ListIterator<K, V> implements Iterator<DictionaryEntry<K, V>> {
+
+        private OrderedLinkedListEntry<K, V> current;
+
+        private ListIterator() {
+            current = (OrderedLinkedListEntry<K, V>) head;
+        }
+
+        public boolean hasNext() {
+            return current != null;
+        }
+
+        public DictionaryEntry<K, V> next() {
+            if (current == null) {
+                return null;
+            } else {
+                DictionaryEntry<K, V> result = current;
+                current = current.getNext();
+                return result;
+            }
+        }
+
+        public void remove() throws UnsupportedOperationException {
+            throw new UnsupportedOperationException();
+        }
+    }
 }
