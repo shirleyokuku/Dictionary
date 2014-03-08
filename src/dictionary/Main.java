@@ -16,9 +16,7 @@ public class Main {
 
         list.put(0, "Yo");
         list.put(1, "Yolo");
-        System.out.print(list.get(0) + " " + list.get(1));
-        list.clear();
-        System.out.println(list);
+        System.out.println(list.get(0) + " " + list.get(1));
 
     }
 

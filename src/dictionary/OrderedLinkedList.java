@@ -55,13 +55,13 @@ public class OrderedLinkedList<K extends Comparable<? super K>, V> implements
         OrderedLinkedListEntry<K, V> entry = head;
         boolean found = false;
 
-        do {
-            try { // See if key exists
-                entry.getKey();
-            } catch (NullPointerException e) {
-                throw new NoSuchElementException();
-            }
+        try { // See if head has a key
+            entry.getKey();
+        } catch (NullPointerException e) {
+            throw new NoSuchElementException();
+        }
 
+        do {
             if (entry.getKey().compareTo(key) == 0) {
                 found = true; // We've found the key!
                 break; // Get out of here!
