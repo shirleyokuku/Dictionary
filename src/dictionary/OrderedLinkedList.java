@@ -1,5 +1,6 @@
 package dictionary;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -211,17 +212,25 @@ public class OrderedLinkedList<K extends Comparable<? super K>, V> implements
     private class ListIterator<K, V> implements Iterator<DictionaryEntry<K, V>> {
 
         private OrderedLinkedListEntry<K, V> current;
+        private int newSize;
 
         private ListIterator() {
             current = (OrderedLinkedListEntry<K, V>) head;
+            newSize = size;
         }
 
-        public boolean hasNext() {
-            return current != null;
+        public boolean hasNext() throws ConcurrentModificationException {
+            if (newSize != size) {
+                throw new ConcurrentModificationException();
+            } else {
+                return current != null;
+            }
         }
 
-        public DictionaryEntry<K, V> next() {
-            if (current == null) {
+        public DictionaryEntry<K, V> next() throws ConcurrentModificationException {
+            if (newSize != size) {
+                throw new ConcurrentModificationException();
+            } else if (current == null) {
                 return null;
             } else {
                 DictionaryEntry<K, V> result = current;

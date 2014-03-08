@@ -1,7 +1,9 @@
 package dictionary;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Stack;
 
 /*
  * Binary search tree based implementation of the Dictionary
@@ -53,7 +55,51 @@ public class BinarySearchTree<K extends Comparable<? super K>, V> implements
 
     @Override
     public Iterator<DictionaryEntry<K, V>> iterator() {
-        return null; // TODO
+        return new TreeIterator<K, V>();
+    }
+
+    private class TreeIterator<K, V> implements Iterator<DictionaryEntry<K, V>> {
+
+        private BinarySearchTreeEntry<K, V> current;
+        private int newSize;
+        Stack<BinarySearchTreeEntry<K, V>> stack = new Stack<BinarySearchTreeEntry<K, V>>();
+
+        private TreeIterator() {
+            current = (BinarySearchTreeEntry<K, V>) root;
+            newSize = size;
+
+        }
+
+        public boolean hasNext() throws ConcurrentModificationException {
+            if (newSize != size) { // If the list has been altered
+                throw new ConcurrentModificationException(); // Throw an exception
+            } else {
+                return (!stack.isEmpty()); // Return true if stack is non-empty
+            }
+        }
+
+        // Throws exception if iterable has been altered
+        public DictionaryEntry<K, V> next() throws ConcurrentModificationException {
+
+            if (newSize != size) { // If the list has been altered
+                throw new ConcurrentModificationException(); // Throw an exception
+            } else {
+                BinarySearchTreeEntry<K, V> result = null;
+                while (current != null) {
+                    stack.push(current);
+                    current = current.getLeft();
+                }
+                if (!stack.isEmpty()) {
+                    result = stack.pop();
+                    current = result.getRight();
+                }
+                return result;
+            }
+        }
+
+        public void remove() throws UnsupportedOperationException {
+            throw new UnsupportedOperationException();
+        }
     }
 
     private BinarySearchTreeEntry<K, V> retrieveEntry(BinarySearchTreeEntry<K, V> node, K searchKey) {
