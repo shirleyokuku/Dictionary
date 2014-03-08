@@ -8,6 +8,11 @@ public class BinarySearchTreeEntry<K, V> implements DictionaryEntry<K, V> {
     private BinarySearchTreeEntry<K, V> left;
     private BinarySearchTreeEntry<K, V> right;
 
+    public BinarySearchTreeEntry(K key, V value) {
+        this.key = key;
+        this.value = value;
+    }
+
     @Override
     public K getKey() {
         return key;
