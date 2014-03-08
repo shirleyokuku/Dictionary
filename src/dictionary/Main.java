@@ -8,7 +8,18 @@ public class Main {
     private static final int REPITITIONS = 500;
 
     public static void main(String[] args) throws FileNotFoundException {
-        // TODO
+
+        OrderedLinkedList<Integer, String> list = new OrderedLinkedList<Integer, String>();
+
+        list.put(0, "Hello");
+        System.out.println(list.get(0));
+
+        list.put(0, "Yo");
+        list.put(1, "Yolo");
+        System.out.print(list.get(0) + " " + list.get(1));
+        list.clear();
+        System.out.println(list);
+
     }
 
 }

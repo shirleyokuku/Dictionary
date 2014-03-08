@@ -17,8 +17,6 @@ public class OrderedLinkedList<K extends Comparable<? super K>, V> implements
     private OrderedLinkedListEntry<K, V> head;
     private int size;
 
-    // Need createOrderedList() ???
-
     /**
      *
      * @return the number of key-value associations stored in this dictionary
@@ -45,8 +43,38 @@ public class OrderedLinkedList<K extends Comparable<? super K>, V> implements
      * @throws NoSuchElementException
      *             if given key does not exist in the dictionary
      */
-    public V get(K key) throws NoSuchElementException {
-        // TODO
+    public V get(K key) {
+
+        OrderedLinkedListEntry<K, V> entry = getEntry(key); // May throw NoSuchElementException
+        return entry.getValue();
+
+    }
+
+    private OrderedLinkedListEntry<K, V> getEntry(K key) throws NoSuchElementException {
+
+        OrderedLinkedListEntry<K, V> entry = head;
+        boolean found = false;
+
+        do {
+            try { // See if key exists
+                entry.getKey();
+            } catch (NullPointerException e) {
+                throw new NoSuchElementException();
+            }
+
+            if (entry.getKey().compareTo(key) == 0) {
+                found = true; // We've found the key!
+                break; // Get out of here!
+            } else {
+                entry = entry.getNext(); // Try the next one...
+            }
+        } while (entry.getNext() != null); // Stop at end of list, or when key found
+
+        if (!found) {
+            throw new NoSuchElementException("The key is not in the list!");
+        }
+
+        return entry;
     }
 
     /**
@@ -89,6 +117,8 @@ public class OrderedLinkedList<K extends Comparable<? super K>, V> implements
 
         }
 
+        size++;
+
     }
 
     // Helper for put
@@ -107,7 +137,7 @@ public class OrderedLinkedList<K extends Comparable<? super K>, V> implements
 
             while ((curr != null)&&(curr.getKey().compareTo(searchKey) <= 0)){
                 prev = curr;
-                curr = curr.getNext( );
+                curr = curr.getNext();
             }
         }
         return prev;
@@ -121,15 +151,56 @@ public class OrderedLinkedList<K extends Comparable<? super K>, V> implements
      * @throws NoSuchElementException
      *             if the key is not in the dictionary
      */
-    public void remove(K key) throws NoSuchElementException {
-        //TODO
+    public void remove(K key) {
+
+        OrderedLinkedListEntry<K, V> entry = getEntry(key); // May throw NoSuchElementException
+        OrderedLinkedListEntry<K, V> before = findStrictlyPrev(entry.getKey());
+
+        if (before == null) { // If entry is the head of the list
+            head = entry.getNext(); // Make entry immediately after the head of the list
+        } else {
+            before.setNext(entry.getNext()); // Make entry before refer to the entry after
+        }
+
+        size--;
+    }
+
+    private OrderedLinkedListEntry<K, V> findStrictlyPrev(K key) {
+
+        OrderedLinkedListEntry<K, V> current = head;
+        Iterator<DictionaryEntry<K, V>> iter = this.iterator();
+
+        if (current.getKey().compareTo(key) == 0) {
+            return null; // There's no entry before the head! Return null
+        } else {
+            while (iter.hasNext()) {
+                if (current.getNext().getKey().compareTo(key) == 0) { // If entry after current is the key
+                    return current; // This must be the previous node!
+                } else {
+                    current = (OrderedLinkedListEntry<K, V>) iter.next(); // Try again...
+                }
+            }
+        } // Out of this if-else statement
+
+        throw new NoSuchElementException(); // Only reached if key not found
+
     }
 
     /**
      * Removes all entries from the dictionary
      */
     public void clear() {
-        //TODO
+
+        OrderedLinkedListEntry<K, V> current = head;
+        OrderedLinkedListEntry<K, V> next;
+        Iterator<DictionaryEntry<K, V>> iter = this.iterator();
+
+        while (iter.hasNext()) {
+            next = current.getNext();
+            remove(current.getKey());
+            current = next;
+        }
+
     }
 
     @Override
